@@ -43,7 +43,7 @@ const createMovie = (req, res, next) => {
     });
 };
 
-onst getMovies = (req, res, next) => {
+const getMovies = (req, res, next) => {
   Movie.find({})
     .then((movies) => res.send(movies))
     .catch((err) => next(err));
