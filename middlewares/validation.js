@@ -5,9 +5,7 @@ const linkRegex = /^(http|https):\/\/(?:www\.)?[a-zA-Z0-9._~\-:?#[\]@!$&'()*+,/;
 
 const registerValidation = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string().pattern(linkRegex),
+    name: Joi.string().min(2).max(30).required(),
     email: Joi.string().required().email().pattern(emailRegex),
     password: Joi.string().required(),
   }),
@@ -23,32 +21,24 @@ const loginValidation = celebrate({
 const validateUpdateUser = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).required(),
-    about: Joi.string().min(2).max(30).required(),
+    email: Joi.string().required().email().pattern(emailRegex),
   }),
 });
 
-const validateUpdateAvatar = celebrate({
+const validateNewMovie = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required().pattern(linkRegex),
-  }),
-});
+    nameRU: Joi.string().min(2).max(30).required(),
+    nameEN: Joi.string().min(2).max(30).required(),
+    country: Joi.string().min(2).max(30).required(),
+    director: Joi.string().min(2).max(30).required(),
+    year: Joi.string().min(2).max(4).required(),
+    description: Joi.string().min(2).max(50).required(),
+    duration: Joi.number().required(),
+    image: Joi.string().required().pattern(linkRegex),
+    trailerLink: Joi.string().required().pattern(linkRegex),
+    thumbnail: Joi.string().required().pattern(linkRegex),
+    movieId: Joi.number().required,
 
-const validateUserId = celebrate({
-  params: Joi.object().keys({
-    id: Joi.string().required().length(24).hex(),
-  }),
-});
-
-const validateCreateCard = celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30).required(),
-    link: Joi.string().required().pattern(linkRegex),
-  }),
-});
-
-const validateCardId = celebrate({
-  params: Joi.object().keys({
-    cardId: Joi.string().required().length(24).hex(),
   }),
 });
 
@@ -56,8 +46,5 @@ module.exports = {
   registerValidation,
   loginValidation,
   validateUpdateUser,
-  validateUpdateAvatar,
-  validateCreateCard,
-  validateCardId,
-  validateUserId,
+  validateNewMovie,
 };

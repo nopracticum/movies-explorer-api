@@ -18,9 +18,9 @@ const register = (req, res, next) => {
     .then(() => res.status(201).send({ message: `Пользователь ${email} успешно зарегестрирован.` }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Переданы некорректные данные'));
+        next(new BadRequestError('При регистрации пользователя произошла ошибка.'));
       } else if (err.code === 11000) {
-        next(new ConflictError('Такой пользователь уже сущетсвует'));
+        next(new ConflictError('Пользователь с таким email уже существует.'));
       } else {
         next(err);
       }
@@ -30,15 +30,16 @@ const register = (req, res, next) => {
 const login = (req, res, next) => {
   const { email, password } = req.body;
 
-  User.findOne({ email }).select('+password')
+  User
+    .findOne({ email })
+    .select('+password')
+    .orFail(new UnauthorizedError('Неправильные почта или пароль'))
     .then((user) => {
-      if (!user) throw new UnauthorizedError('Неправильные почта или пароль');
-
       bcrypt.compare(password, user.password, (err, isValidPassword) => {
-        if (!isValidPassword) throw new UnauthorizedError('Неправильные почта или пароль');
+        if (!isValidPassword) throw new UnauthorizedError('Вы ввели неправильный логин или пароль.');
 
         const token = createJwtToken(user._id);
-        console.log('Аутентификация успешна!');
+
         return res.status(200).send({ token });
       });
     })
@@ -53,15 +54,12 @@ const getUsers = (req, res, next) => {
 
 const getUserInfo = (req, res, next) => {
   User.findById(req.user._id)
+    .orFail(new NotFoundError('Пользователь не найден'))
     .then((user) => {
-      if (!user) {
-        next(new NotFoundError('Пользователь не найден'));
-      } else {
-        res.send({
-          name: user.name,
-          email: user.email,
-        });
-      }
+      res.send({
+        name: user.name,
+        email: user.email,
+      });
     })
     .catch((err) => next(err));
 };
@@ -80,7 +78,7 @@ const updateUser = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Переданы некорректные данные'));
+        next(new BadRequestError('При обновлении профиля произошла ошибка'));
       } else {
         next(err);
       }
