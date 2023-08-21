@@ -5,9 +5,10 @@ require('dotenv').config();
 
 const router = require('./routes/index');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const error = require('./middlewares/error');
 
 const app = express();
-const { PORT, DB_ADRESS } = process.env;
+const { PORT } = process.env;
 
 app.listen(PORT, () => console.log(`App listening on port: ${PORT}`));
 
@@ -20,3 +21,4 @@ app.use(express.json());
 app.use(requestLogger);
 app.use(router);
 app.use(errorLogger);
+app.use(error);
