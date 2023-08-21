@@ -27,7 +27,7 @@ const movieSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator: (value) => validator.isURL(value),
-      message: 'Incorrect type of url link',
+      message: 'Некорректый формат url.',
     },
   },
   trailerLink: {
@@ -35,7 +35,7 @@ const movieSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator: (value) => validator.isURL(value),
-      message: 'Incorrect type of url link',
+      message: 'Некорректый формат url.',
     },
   },
   thumbnail: {
@@ -43,7 +43,7 @@ const movieSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator: (value) => validator.isURL(value),
-      message: 'Incorrect type of url link',
+      message: 'Некорректый формат url.',
     },
   },
   owner: {

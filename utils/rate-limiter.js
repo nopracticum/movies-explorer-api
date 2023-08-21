@@ -4,7 +4,7 @@ const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
   legacyHeaders: false,
-  message: 'Слишком много запросов, пожалуйста попробуйте позже',
+  message: 'Превышено ограничение количества запросов, попробуйте снова позже.',
 });
 
 module.exports = authLimiter;
