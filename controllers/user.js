@@ -5,7 +5,7 @@ const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
 const ConflictError = require('../errors/ConflictError');
 const UnauthorizedError = require('../errors/UnauthorizedError');
-const { createJwtToken } = require('../utils/jwt');
+const { createJwtToken } = require('../utils/constants');
 const {
   registerSuccesMessage,
   registerErrorMessage,

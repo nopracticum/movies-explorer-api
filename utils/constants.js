@@ -18,17 +18,15 @@ const SECRET_STRING = NODE_ENV === 'production'
 && JWT_SECRET ? JWT_SECRET : DEV_SECRET;
 
 const registerSuccesMessage = 'Пользователь успешно зарегестрирован.';
-const wrongDataMessage = 'Неправильные почта или пароль';
-const userAlreadyExist = 'Пользователь уже существует.';
 const registerErrorMessage = 'При регистрации пользователя произошла ошибка.';
 const emailUsedMessage = 'Пользователь с таким email уже существует.';
-
+const wrongDataMessage = 'Неправильные почта или пароль';
 const userNotFound = 'Пользователь не найден';
 const updateProfileErrMessage = 'При обновлении профиля произошла ошибка';
+const userAlreadyExist = 'Пользователь с таким email уже существует.';
 const invalidDataError = 'Переданы некорректные данные';
 const movieNotFoundMessage = 'Фильм не найден';
 const deleteFilmPermissionError = 'Недостаточно прав для удаления фильма';
-
 const authorizationTokenInvalidError = 'При авторизации произошла ошибка. Переданный токен некорректен';
 const authorizationTokenFormatError = 'При авторизации произошла ошибка. Токен не передан или передан не в том формате';
 
