@@ -4,7 +4,7 @@ const { errors } = require('celebrate');
 const cors = require('cors');
 const helmet = require('helmet');
 
-const { SERVER_PORT, DB } = require('./helpers/config');
+const { SERVER_PORT, DB } = require('./utils/constants');
 const router = require('./routes/index');
 const error = require('./middlewares/error');
 const { requestLogger, errorLogger } = require('./middlewares/logger');

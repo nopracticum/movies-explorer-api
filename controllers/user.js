@@ -1,12 +1,20 @@
 const bcrypt = require('bcryptjs');
-
 const User = require('../models/user');
 
 const NotFoundError = require('../errors/NotFoundError');
 const BadRequestError = require('../errors/BadRequestError');
 const ConflictError = require('../errors/ConflictError');
 const UnauthorizedError = require('../errors/UnauthorizedError');
-const { createJwtToken } = require('../helpers/jwt');
+const { createJwtToken } = require('../utils/jwt');
+const {
+  registerSuccesMessage,
+  registerErrorMessage,
+  emailUsedMessage,
+  wrongDataMessage,
+  userNotFound,
+  updateProfileErrMessage,
+  userAlreadyExist,
+} = require('../utils/constants');
 
 const register = (req, res, next) => {
   const { name, email, password } = req.body;
@@ -15,12 +23,12 @@ const register = (req, res, next) => {
     .then((hash) => User.create({
       name, email, password: hash,
     }))
-    .then(() => res.status(201).send({ message: `Пользователь ${email} успешно зарегестрирован.` }))
+    .then(() => res.status(201).send({ message: registerSuccesMessage }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('При регистрации пользователя произошла ошибка.'));
+        next(new BadRequestError(registerErrorMessage));
       } else if (err.code === 11000) {
-        next(new ConflictError('Пользователь с таким email уже существует.'));
+        next(new ConflictError(emailUsedMessage));
       } else {
         next(err);
       }
@@ -33,10 +41,10 @@ const login = (req, res, next) => {
   User
     .findOne({ email })
     .select('+password')
-    .orFail(new UnauthorizedError('Неправильные почта или пароль'))
+    .orFail(new UnauthorizedError(wrongDataMessage))
     .then((user) => {
       bcrypt.compare(password, user.password, (err, isValidPassword) => {
-        if (!isValidPassword) throw new UnauthorizedError('Вы ввели неправильный логин или пароль.');
+        if (!isValidPassword) throw new UnauthorizedError(wrongDataMessage);
 
         const token = createJwtToken(user._id);
 
@@ -54,7 +62,7 @@ const getUsers = (req, res, next) => {
 
 const getUserInfo = (req, res, next) => {
   User.findById(req.user._id)
-    .orFail(new NotFoundError('Пользователь не найден'))
+    .orFail(new NotFoundError(userNotFound))
     .then((user) => {
       res.send({
         name: user.name,
@@ -78,7 +86,9 @@ const updateUser = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('При обновлении профиля произошла ошибка'));
+        next(new BadRequestError(updateProfileErrMessage));
+      } else if (err.code === 11000) {
+        next(new ConflictError(userAlreadyExist));
       } else {
         next(err);
       }
