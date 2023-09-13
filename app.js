@@ -1,43 +1,27 @@
-require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const path = require('path');
-const cookieParser = require('cookie-parser');
-const cors = require('./middlewares/cors');
-const handleErrors = require('./middlewares/errors');
-const configureHelmet = require('./safety/configureHelmet');
+const { errors } = require('celebrate');
+const cors = require('cors');
+const helmet = require('helmet');
 
-const { DB_ADDRESS } = require('./utils/config');
-
-mongoose
-  .connect(DB_ADDRESS, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    console.log('Успешное подключение к базе данных');
-  })
-  .catch((error) => {
-    console.log('Ошибка при подключении к базе данных:', error.name);
-  });
-
-const { PORT = 3000 } = process.env;
+const { SERVER_PORT, DB } = require('./utils/constants');
+const router = require('./routes/index');
+const error = require('./middlewares/error');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const app = express();
 
-app.use(cors);
+app.listen(SERVER_PORT, () => console.log(`App listening on port: ${SERVER_PORT}`));
 
-app.use(express.static(path.join(__dirname, 'public')));
+mongoose.connect(DB)
+  .then(() => console.log('Connected to DB'))
+  .catch((err) => console.error('Error:', err));
 
+app.use(helmet());
+app.use(cors());
 app.use(express.json());
-
-app.use(cookieParser());
-
-configureHelmet(app);
-
-app.use(require('./routes/index'));
-
-app.use(handleErrors);
-
-app.listen(PORT, () => {
-});
+app.use(requestLogger);
+app.use(router);
+app.use(errorLogger);
+app.use(errors());
+app.use(error);

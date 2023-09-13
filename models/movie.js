@@ -1,9 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 
-const { INVALID_ADDRESS } = require('../utils/constants');
-
-const movieschema = new mongoose.Schema({
+const movieSchema = new mongoose.Schema({
   country: {
     type: String,
     required: true,
@@ -13,39 +11,39 @@ const movieschema = new mongoose.Schema({
     required: true,
   },
   duration: {
-    required: true,
     type: Number,
+    required: true,
   },
   year: {
-    required: true,
     type: String,
+    required: true,
   },
   description: {
-    required: true,
     type: String,
+    required: true,
   },
   image: {
-    required: true,
     type: String,
+    required: true,
     validate: {
-      validator: (URL) => validator.isURL(URL),
-      message: INVALID_ADDRESS,
+      validator: (value) => validator.isURL(value),
+      message: 'Некорректый формат url.',
     },
   },
   trailerLink: {
-    required: true,
     type: String,
+    required: true,
     validate: {
-      validator: (URL) => validator.isURL(URL),
-      message: INVALID_ADDRESS,
+      validator: (value) => validator.isURL(value),
+      message: 'Некорректый формат url.',
     },
   },
   thumbnail: {
-    required: true,
     type: String,
+    required: true,
     validate: {
-      validator: (URL) => validator.isURL(URL),
-      message: INVALID_ADDRESS,
+      validator: (value) => validator.isURL(value),
+      message: 'Некорректый формат url.',
     },
   },
   owner: {
@@ -58,15 +56,15 @@ const movieschema = new mongoose.Schema({
     required: true,
   },
   nameRU: {
-    required: true,
     type: String,
+    required: true,
   },
   nameEN: {
-    required: true,
     type: String,
+    required: true,
   },
-}, {
-  versionKey: false,
 });
 
-module.exports = mongoose.model('Movie', movieschema);
+const Movie = mongoose.model('movie', movieSchema);
+
+module.exports = Movie;

@@ -1,31 +1,29 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 
-const { INVALID_EMAIL } = require('../utils/constants');
-
 const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    minlength: 2,
-    maxlength: 30,
-    required: true,
-  },
   email: {
-    required: true,
     type: String,
-    validate: {
-      validator: (email) => (email) => /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email),
-      message: INVALID_EMAIL,
-    },
+    required: true,
     unique: true,
+    validate: {
+      validator: (value) => validator.isEmail(value),
+      message: 'Некорректый адрес электронной почты.',
+    },
   },
   password: {
-    required: true,
     type: String,
+    required: true,
     select: false,
   },
-}, {
-  versionKey: false, // Отключение опции versionKey
+  name: {
+    type: String,
+    required: true,
+    minlength: 2,
+    maxlength: 30,
+  },
 });
 
-module.exports = mongoose.model('user', userSchema);
+const User = mongoose.model('user', userSchema);
+
+module.exports = User;
