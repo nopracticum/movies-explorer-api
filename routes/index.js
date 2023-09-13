@@ -9,7 +9,7 @@ const { loginValidator, createUserValidator } = require('../middlewares/validato
 const { requestLogger, errorLogger } = require('../middlewares/logger');
 const auth = require('../middlewares/auth');
 const rateLimiter = require('../safety/rateLimiter');
-const NotFoundError = require('../errors/NotFoundError');
+const NotFoundError = require('../errors/notFoundError');
 
 const router = express.Router();
 
