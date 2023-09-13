@@ -9,9 +9,9 @@ const {
   MOVIE_NOT_FOUND,
   MOVIE_DELETED,
 } = require('../utils/constants');
-const BadRequestError = require('../errors/badRequestError');
-const NotFoundError = require('../errors/notFoundError');
-const ForbiddenError = require('../errors/forbiddenError');
+const BadRequestError = require('../errors/BadRequestError');
+const NotFoundError = require('../errors/NotFoundError');
+const ForbiddenError = require('../errors/ForbiddenError');
 
 const populateOptions = [
   { path: 'owner', select: ['name', '_id'] },

@@ -14,7 +14,7 @@ module.exports = (req, res, next) => {
   const { origin } = req.headers;
   const { method } = req;
   const requestHeaders = req.headers['access-control-request-headers'];
-  const allowesMethods = 'GET,HEAD,PUT,PATCH,POST,DELETE';
+  const allowesMethods = 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS';
 
   if (allowedCors.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
