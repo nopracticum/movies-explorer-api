@@ -16,10 +16,10 @@ const {
   INVALID_USER_UPDATE_DATA,
 } = require('../utils/constants');
 
-const BadRequestError = require('../errors/badRequestError');
-const ConflictError = require('../errors/conflictError');
-const UnauthorizedError = require('../errors/unauthorizedError');
-const NotFoundError = require('../errors/notFoundError');
+const BadRequestError = require('../errors/BadRequestError');
+const ConflictError = require('../errors/ConflictError');
+const UnauthorizedError = require('../errors/UnauthorizedError');
+const NotFoundError = require('../errors/NotFoundError');
 
 const formatUserData = (user) => ({
   _id: user._id,
