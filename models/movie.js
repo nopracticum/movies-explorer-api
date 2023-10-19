@@ -1,52 +1,50 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 
-const { INVALID_ADDRESS } = require('../utils/constants');
-
-const movieschema = new mongoose.Schema({
+const movieSchema = new mongoose.Schema({
   country: {
     type: String,
-    required: true,
+    required: [true, 'Поле "country" должно быть заполнено'],
   },
   director: {
     type: String,
-    required: true,
+    required: [true, 'Поле "director" должно быть заполнено'],
   },
   duration: {
-    required: true,
     type: Number,
+    required: [true, 'Поле "duration" должно быть заполнено'],
   },
   year: {
-    required: true,
     type: String,
+    required: [true, 'Поле "year" должно быть заполнено'],
   },
   description: {
-    required: true,
     type: String,
+    required: [true, 'Поле "description" должно быть заполнено'],
   },
   image: {
-    required: true,
     type: String,
     validate: {
-      validator: (URL) => validator.isURL(URL),
-      message: INVALID_ADDRESS,
+      validator: (v) => validator.isURL(v),
+      message: 'Некорректный URL',
     },
+    required: [true, 'Поле "image" должно быть заполнено'],
   },
   trailerLink: {
-    required: true,
     type: String,
     validate: {
-      validator: (URL) => validator.isURL(URL),
-      message: INVALID_ADDRESS,
+      validator: (v) => validator.isURL(v),
+      message: 'Некорректный URL',
     },
+    required: [true, 'Поле "trailerLink" должно быть заполнено'],
   },
   thumbnail: {
-    required: true,
     type: String,
     validate: {
-      validator: (URL) => validator.isURL(URL),
-      message: INVALID_ADDRESS,
+      validator: (v) => validator.isURL(v),
+      message: 'Некорректный URL',
     },
+    required: [true, 'Поле "thumbnail" должно быть заполнено'],
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
@@ -58,15 +56,13 @@ const movieschema = new mongoose.Schema({
     required: true,
   },
   nameRU: {
-    required: true,
     type: String,
+    required: true,
   },
   nameEN: {
-    required: true,
     type: String,
+    required: true,
   },
-}, {
-  versionKey: false,
-});
+}, { versionKey: false });
 
-module.exports = mongoose.model('Movie', movieschema);
+module.exports = mongoose.model('movie', movieSchema);

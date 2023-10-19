@@ -1,80 +1,67 @@
-const mongoose = require('mongoose');
 const Movie = require('../models/movie');
-const {
-  SUCCESS_STATUS,
-  CREATED_STATUS,
-  INVALID_MOVIE_DATA,
-  INVALID_MOVIE_ID,
-  DELETE_MOVIE_FORBIDDEN,
-  MOVIE_NOT_FOUND,
-  MOVIE_DELETED,
-} = require('../utils/constants');
 const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
 const ForbiddenError = require('../errors/ForbiddenError');
 
-const populateOptions = [
-  { path: 'owner', select: ['name', '_id'] },
-];
+const CREATED_CODE = 201;
 
-const formatMovie = (movie) => ({
-  _id: movie._id,
-  country: movie.country,
-  director: movie.director,
-  duration: movie.duration,
-  year: movie.year,
-  description: movie.description,
-  image: movie.image,
-  trailerLink: movie.trailerLink,
-  thumbnail: movie.thumbnail,
-  owner: {
-    _id: movie.owner._id,
-    name: movie.owner.name,
-  },
-  movieId: movie.movieId,
-  nameRU: movie.nameRU,
-  nameEN: movie.nameEN,
-});
+module.exports.getMovies = (req, res, next) => {
+  Movie.find({})
+    .then((movies) => res.send({ data: movies }))
+    .catch(next);
+};
 
 module.exports.createMovie = (req, res, next) => {
-  const data = { ...req.body, owner: req.user._id };
-  Movie.create(data)
-    .then((movie) => res.status(CREATED_STATUS).send(formatMovie(movie)))
+  const {
+    country,
+    director,
+    duration,
+    year,
+    description,
+    image,
+    trailerLink,
+    thumbnail,
+    movieId,
+    nameRU,
+    nameEN,
+  } = req.body;
+
+  Movie.create({
+    country,
+    director,
+    duration,
+    year,
+    description,
+    image,
+    trailerLink,
+    thumbnail,
+    movieId,
+    nameRU,
+    nameEN,
+    owner: req.user._id,
+  })
+    .then((movie) => res.status(CREATED_CODE).send({ data: movie }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new BadRequestError(INVALID_MOVIE_DATA));
+        next(new BadRequestError('Некорректные данные при создании фильма'));
+      } else {
+        next(err);
       }
-      return next(err);
     });
 };
 
-module.exports.deleteMovieById = (req, res, next) => {
-  const userId = req.user._id;
+module.exports.removeMovieById = (req, res, next) => {
   Movie.findById(req.params.movieId)
-    .orFail()
+    .orFail(new NotFoundError('Фильм с указанным id не найден'))
     .then((movie) => {
-      if (movie.owner._id.toString() !== userId) {
-        throw new ForbiddenError(DELETE_MOVIE_FORBIDDEN);
+      if (movie.owner.toString() === req.user._id) {
+        Movie.deleteOne(movie._id)
+          .then((removedMovie) => {
+            res.send({ data: removedMovie });
+          }).catch(next);
+      } else {
+        throw new ForbiddenError('Чужой фильм нельзя удалить!');
       }
-      return Movie.deleteOne({ _id: req.params.movieId })
-        .then(() => {
-          res.status(SUCCESS_STATUS).send({ message: MOVIE_DELETED });
-        });
     })
-    .catch((err) => {
-      if (err instanceof mongoose.Error.CastError) {
-        return next(new BadRequestError(INVALID_MOVIE_ID));
-      }
-      if (err instanceof mongoose.Error.DocumentNotFoundError) {
-        return next(new NotFoundError(MOVIE_NOT_FOUND));
-      }
-      return next(err);
-    });
-};
-
-module.exports.getUserMovies = (req, res, next) => {
-  Movie.find({ owner: req.user._id })
-    .populate(populateOptions)
-    .then((movies) => res.status(SUCCESS_STATUS).send(movies.map(formatMovie)))
-    .catch((err) => next(err));
+    .catch(next);
 };

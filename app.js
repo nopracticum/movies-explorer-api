@@ -1,43 +1,42 @@
-require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
-const path = require('path');
+const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
+const { errors } = require('celebrate');
+
+const routes = require('./routes/index');
+const errorHandler = require('./middlewares/errorHandler');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 const cors = require('./middlewares/cors');
-const handleErrors = require('./middlewares/errors');
-const configureHelmet = require('./safety/configureHelmet');
 
-const { DB_ADDRESS } = require('./utils/config');
-
-mongoose
-  .connect(DB_ADDRESS, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    console.log('Успешное подключение к базе данных');
-  })
-  .catch((error) => {
-    console.log('Ошибка при подключении к базе данных:', error.name);
-  });
-
-const { PORT = 3000 } = process.env;
+const config = require('./config');
+const { connectDatabase } = require('./db');
 
 const app = express();
 
-app.use(cors);
-
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.use(express.json());
+app.use(helmet());
+app.disable('x-powered-by');
 
 app.use(cookieParser());
+app.use(express.json());
 
-configureHelmet(app);
+app.use(requestLogger);
 
-app.use(require('./routes/index'));
-
-app.use(handleErrors);
-
-app.listen(PORT, () => {
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
 });
+
+app.use(cors);
+
+connectDatabase();
+
+app.use(routes);
+
+
+app.use(errorLogger);
+
+app.use(errors());
+app.use(errorHandler);
+
+app.listen(config.app.port);
